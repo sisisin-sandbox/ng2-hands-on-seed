@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from 'angular2/core';
+import { Component, OnInit } from 'angular2/core';
 import {RouteParams} from 'angular2/router';
 
 import { Hero } from './hero';
@@ -20,7 +20,7 @@ import { HeroService } from './hero.service';
   `
 })
 export class HeroDetailComponent implements OnInit {
-  @Input() hero: Hero;
+  hero: Hero;
 
   constructor(
     private _heroService: HeroService,
