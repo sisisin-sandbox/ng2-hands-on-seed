@@ -24,7 +24,7 @@ git clone git@github.com:ng-japan/ng2-hands-on-seed.git ng2-hands-on
 
 Zipをダウンロードする方法
 
-[Zipでダウンロード](https://github.com/laco0416/ng2-hands-on-seed/archive/master.zip)
+[Zipでダウンロード](https://github.com/ng-japan/ng2-hands-on-seed/archive/master.zip)
 
 ### プロジェクトのセットアップ (できるだけやってほしい)  
 
