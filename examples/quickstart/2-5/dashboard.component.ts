@@ -8,9 +8,9 @@ import { HeroService } from './hero.service';
   selector: 'my-dashboard',
   template: `
     <h3>Top Heroes</h3>
-    <div>
-        <div *ngFor="#hero of heroes" (click)="gotoDetail(hero)">
-            <div>
+    <div class="grid grid-pad">
+        <div *ngFor="#hero of heroes" (click)="gotoDetail(hero)" class="col-1-4">
+            <div class="module hero">
                 <h4>{{hero.name}}</h4>
             </div>
         </div>
