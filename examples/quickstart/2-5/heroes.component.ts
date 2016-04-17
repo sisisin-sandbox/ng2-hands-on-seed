@@ -2,7 +2,6 @@ import { Component, OnInit } from 'angular2/core';
 import { Router } from 'angular2/router';
 
 import { Hero } from './hero';
-import { HeroDetailComponent } from './hero-detail.component';
 import { HeroService } from './hero.service';
 
 @Component({
@@ -21,7 +20,6 @@ import { HeroService } from './hero.service';
     <button (click)="gotoDetail()">View Details</button>
     </div>  
   `,
-  directives: [HeroDetailComponent]
 })
 export class HeroesComponent implements OnInit {
   heroes: Hero[];
