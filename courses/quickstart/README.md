@@ -31,10 +31,10 @@ Zipをダウンロードする方法
 
 ### プロジェクトのセットアップ  
 
-ダウンロードしたプロジェクトのディレクトリ内で`npm install`コマンドを実行します
+ダウンロードしたプロジェクトのディレクトリで次のコマンドを実行します
  
 ```
-cd ng2-hands-on
+cd ng2-hands-on/courses/quickstart
 npm install
 ```
 
