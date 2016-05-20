@@ -6,8 +6,8 @@ System.config({
   map: {
     app: 'app',
     typescript: 'node_modules/typescript/lib/typescript.js',
-    '@angular': './node_modules/@angular',
-    'rxjs': './node_modules/rxjs'
+    '@angular': 'node_modules/@angular',
+    'rxjs': 'node_modules/rxjs'
   },
   packages: {
     app: {
