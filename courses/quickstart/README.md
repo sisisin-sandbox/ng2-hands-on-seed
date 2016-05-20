@@ -45,7 +45,7 @@ npm install
 追加したファイルに以下のようなコードを実装してください。
 
 ```ts
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
     selector: 'my-app',
@@ -67,8 +67,8 @@ appディレクトリに`main.ts`というファイルを追加します。
 中身は以下の通りです。
 
 ```ts
-import {bootstrap}    from '@angular/platform-browser-dynamic'
-import {AppComponent} from './app.component'
+import { bootstrap }    from '@angular/platform-browser-dynamic'
+import { AppComponent } from './app.component'
 
 bootstrap(AppComponent);
 ```
@@ -111,7 +111,7 @@ https://angular.io/resources/live-examples/tutorial/ts/plnkr.html
 `app.component.ts`の内容を以下のように変更してください。
 
 ```ts
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
 
 class Hero {
   id: number;
@@ -168,7 +168,7 @@ TypeScriptをコンパイルすると型のエラーがわかるので大規模�
 `app/app.component.ts`を以下のように書き換えます。
 
 ```ts
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
 
 class Hero {
   id: number;
@@ -262,8 +262,8 @@ export class Hero {
 新たに`app/hero-detail.component.ts`を作り、内容を以下の通りにします。
 
 ```ts
-import {Component, Input} from '@angular/core';
-import {Hero} from './hero';
+import { Component, Input } from '@angular/core';
+import { Hero } from './hero';
 
 @Component({
   selector: 'my-hero-detail',
@@ -286,9 +286,9 @@ export class HeroDetailComponent {
 また、`app/app.component.ts`を以下のように修正します。
 
 ```ts
-import {Component} from '@angular/core';
-import {Hero} from './hero';
-import {HeroDetailComponent} from './hero-detail.component';
+import { Component } from '@angular/core';
+import { Hero } from './hero';
+import { HeroDetailComponent } from './hero-detail.component';
 
 @Component({
   selector: 'my-app',
@@ -343,7 +343,7 @@ Serviceとは具体的にどのようなものでしょうか。
 このダミーデータを`app/mock-heroes.ts`に以下のように定義します。
 
 ```ts
-import {Hero} from './hero';
+import { Hero } from './hero';
 
 export const HEROES: Hero[] = [
     {"id": 11, "name": "Mr. Nice"},
@@ -363,9 +363,9 @@ export const HEROES: Hero[] = [
 `app/hero.service.ts`を作り、以下のような内容にします。
 
 ```ts
-import {Hero} from './hero';
-import {HEROES} from './mock-heroes';
-import {Injectable} from '@angular/core';
+import { Hero } from './hero';
+import { HEROES } from './mock-heroes';
+import { Injectable } from '@angular/core';
 
 @Injectable()
 export class HeroService {
@@ -386,10 +386,10 @@ export class HeroService {
 そして、`app/app.component.ts`の中身を以下のように修正して`HeroService`を利用します。
 
 ```ts
-import {Component, OnInit} from '@angular/core';
-import {Hero} from './hero';
-import {HeroDetailComponent} from './hero-detail.component';
-import {HeroService} from './hero.service';
+import { Component, OnInit } from '@angular/core';
+import { Hero } from './hero';
+import { HeroDetailComponent } from './hero-detail.component';
+import { HeroService } from './hero.service';
 
 @Component({
   selector: 'my-app',
