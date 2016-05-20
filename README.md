@@ -1,36 +1,12 @@
 # ng2-hands-on-seed
-Angular 2のハンズオン用プロジェクトです
 
-## 準備
-わかるところまでやっておいてもらえるとスムーズに進行できて助かります。
+このリポジトリは Angular日本ユーザーグループが作成したAngular 2のハンズオン用シードプロジェクトです。
 
-### Node.jsのインストール
+## Courses
 
-[Node.js](http://nodejs.org/)からお使いのOSに合わせたNode.jsをインストールしてください。
+| Name                              | Level    |
+|----                               |----      |
+| [Quick Start](courses/quickstart) | Beginner | 
 
-ターミナル(コマンドプロンプト)を開いて以下のコマンドが実行できればインストール成功です
 
-```
-node -v
-```
 
-### プロジェクトのダウンロード  
-
-GitHubからクローンする方法
-
-```
-git clone git@github.com:ng-japan/ng2-hands-on-seed.git ng2-hands-on
-```
-
-Zipをダウンロードする方法
-
-[Zipでダウンロード](https://github.com/ng-japan/ng2-hands-on-seed/archive/master.zip)
-
-### プロジェクトのセットアップ  
-
-ダウンロードしたプロジェクトのディレクトリ内で`npm install`コマンドを実行します
- 
-```
-cd ng2-hands-on
-npm install
-```

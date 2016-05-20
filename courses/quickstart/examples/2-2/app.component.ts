@@ -1,4 +1,4 @@
-import {Component} from 'angular2/core';
+import { Component } from '@angular/core';
 
 class Hero {
   id: number;
@@ -11,7 +11,7 @@ class Hero {
     <h1>{{title}}</h1>
     <h2>My Heroes</h2>
     <ul class="heroes">
-    <li [class.selected]="hero === selectedHero" *ngFor="#hero of heroes" (click)="onSelect(hero)">
+    <li [class.selected]="hero === selectedHero" *ngFor="let hero of heroes" (click)="onSelect(hero)">
         <span class="badge">{{hero.id}}</span> {{hero.name}}
     </li>
     </ul>

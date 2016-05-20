@@ -2,7 +2,41 @@
 このハンズオンではAngular 2公式の[チュートリアル](https://angular.io/docs/ts/latest/quickstart.html)をベースに行います。
 開発環境は[ハンズオン用のベースプロジェクト](https://github.com/ng-japan/ng2-hands-on-seed)を使用します。
 
-Angularのバージョンは、執筆時点での最新版の2.0.0-beta.13を使用しています。
+Angularのバージョンは、作成時の最新版である2.0.0-rc.1を使用しています。
+
+## 準備
+わかるところまでやっておいてもらえるとスムーズに進行できて助かります。
+
+### Node.jsのインストール
+
+[Node.js](http://nodejs.org/)からお使いのOSに合わせたNode.jsをインストールしてください。
+
+ターミナル(コマンドプロンプト)を開いて以下のコマンドが実行できればインストール成功です
+
+```
+node -v
+```
+
+### プロジェクトのダウンロード  
+
+GitHubからクローンする方法
+
+```
+git clone git@github.com:ng-japan/ng2-hands-on-seed.git ng2-hands-on
+```
+
+Zipをダウンロードする方法
+
+[Zipでダウンロード](https://github.com/ng-japan/ng2-hands-on-seed/archive/master.zip)
+
+### プロジェクトのセットアップ  
+
+ダウンロードしたプロジェクトのディレクトリで次のコマンドを実行します
+ 
+```
+cd ng2-hands-on/courses/quickstart
+npm install
+```
 
 ## 1. まずは肩慣らし
 早速、Angular 2アプリの構成単位となるComponentを実装してみましょう。
@@ -11,7 +45,7 @@ Angularのバージョンは、執筆時点での最新版の2.0.0-beta.13を使
 追加したファイルに以下のようなコードを実装してください。
 
 ```ts
-import {Component} from 'angular2/core';
+import { Component } from '@angular/core';
 
 @Component({
     selector: 'my-app',
@@ -33,8 +67,8 @@ appディレクトリに`main.ts`というファイルを追加します。
 中身は以下の通りです。
 
 ```ts
-import {bootstrap}    from 'angular2/platform/browser'
-import {AppComponent} from './app.component'
+import { bootstrap }    from '@angular/platform-browser-dynamic'
+import { AppComponent } from './app.component'
 
 bootstrap(AppComponent);
 ```
@@ -77,7 +111,7 @@ https://angular.io/resources/live-examples/tutorial/ts/plnkr.html
 `app.component.ts`の内容を以下のように変更してください。
 
 ```ts
-import {Component} from 'angular2/core';
+import { Component } from '@angular/core';
 
 class Hero {
   id: number;
@@ -134,7 +168,7 @@ TypeScriptをコンパイルすると型のエラーがわかるので大規模�
 `app/app.component.ts`を以下のように書き換えます。
 
 ```ts
-import {Component} from 'angular2/core';
+import { Component } from '@angular/core';
 
 class Hero {
   id: number;
@@ -147,7 +181,7 @@ class Hero {
     <h1>{{title}}</h1>
     <h2>My Heroes</h2>
     <ul class="heroes">
-    <li [class.selected]="hero === selectedHero" *ngFor="#hero of heroes" (click)="onSelect(hero)">
+    <li [class.selected]="hero === selectedHero" *ngFor="let hero of heroes" (click)="onSelect(hero)">
         <span class="badge">{{hero.id}}</span> {{hero.name}}
     </li>
     </ul>
@@ -186,7 +220,7 @@ var HEROES: Hero[] = [
 
 `template`の中にも新しい要素がいくつか出ています。
 
-まず、`*ngFor="#hero of heroes"`という部分は`heroes`リストの1件1件について、以下の要素を生成します。
+まず、`*ngFor="let hero of heroes"`という部分は`heroes`リストの1件1件について、以下の要素を生成します。
 
 ```html
 <li [class.selected]="hero === selectedHero" (click)="onSelect(hero)">
@@ -228,8 +262,8 @@ export class Hero {
 新たに`app/hero-detail.component.ts`を作り、内容を以下の通りにします。
 
 ```ts
-import {Component, Input} from 'angular2/core';
-import {Hero} from './hero';
+import { Component, Input } from '@angular/core';
+import { Hero } from './hero';
 
 @Component({
   selector: 'my-hero-detail',
@@ -252,9 +286,9 @@ export class HeroDetailComponent {
 また、`app/app.component.ts`を以下のように修正します。
 
 ```ts
-import {Component} from 'angular2/core';
-import {Hero} from './hero';
-import {HeroDetailComponent} from './hero-detail.component';
+import { Component } from '@angular/core';
+import { Hero } from './hero';
+import { HeroDetailComponent } from './hero-detail.component';
 
 @Component({
   selector: 'my-app',
@@ -262,8 +296,8 @@ import {HeroDetailComponent} from './hero-detail.component';
     <h1>{{title}}</h1>
     <h2>My Heroes</h2>
     <ul class="heroes">
-    <li [class.selected]="hero === selectedHero" *ngFor="#hero of heroes" (click)="onSelect(hero)">
-        <span>{{hero.id}}: {{hero.name}}</span> 
+    <li [class.selected]="hero === selectedHero" *ngFor="let hero of heroes" (click)="onSelect(hero)">
+        <span class="badge">{{hero.id}}</span> {{hero.name}}
     </li>
     </ul>
     <my-hero-detail [hero]="selectedHero"></my-hero-detail>
@@ -309,7 +343,7 @@ Serviceとは具体的にどのようなものでしょうか。
 このダミーデータを`app/mock-heroes.ts`に以下のように定義します。
 
 ```ts
-import {Hero} from './hero';
+import { Hero } from './hero';
 
 export const HEROES: Hero[] = [
     {"id": 11, "name": "Mr. Nice"},
@@ -329,9 +363,9 @@ export const HEROES: Hero[] = [
 `app/hero.service.ts`を作り、以下のような内容にします。
 
 ```ts
-import {Hero} from './hero';
-import {HEROES} from './mock-heroes';
-import {Injectable} from 'angular2/core';
+import { Hero } from './hero';
+import { HEROES } from './mock-heroes';
+import { Injectable } from '@angular/core';
 
 @Injectable()
 export class HeroService {
@@ -352,10 +386,10 @@ export class HeroService {
 そして、`app/app.component.ts`の中身を以下のように修正して`HeroService`を利用します。
 
 ```ts
-import {Component, OnInit} from 'angular2/core';
-import {Hero} from './hero';
-import {HeroDetailComponent} from './hero-detail.component';
-import {HeroService} from './hero.service';
+import { Component, OnInit } from '@angular/core';
+import { Hero } from './hero';
+import { HeroDetailComponent } from './hero-detail.component';
+import { HeroService } from './hero.service';
 
 @Component({
   selector: 'my-app',
@@ -363,7 +397,7 @@ import {HeroService} from './hero.service';
     <h1>{{title}}</h1>
     <h2>My Heroes</h2>
     <ul class="heroes">
-    <li [class.selected]="hero === selectedHero" *ngFor="#hero of heroes" (click)="onSelect(hero)">
+    <li [class.selected]="hero === selectedHero" *ngFor="let hero of heroes" (click)="onSelect(hero)">
         <span class="badge">{{hero.id}}</span> {{hero.name}}
     </li>
     </ul>
@@ -414,8 +448,8 @@ Componentの組み立て方はわかってきましたか？
 `app/dashboard.component.ts`
 
 ```ts
-import { Component, OnInit } from 'angular2/core';
-import { Router } from 'angular2/router';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router-deprecated';
 
 import { Hero } from './hero';
 import { HeroService } from './hero.service';
@@ -425,7 +459,7 @@ import { HeroService } from './hero.service';
   template: `
     <h3>Top Heroes</h3>
     <div class="grid grid-pad">
-        <div *ngFor="#hero of heroes" (click)="gotoDetail(hero)" class="col-1-4">
+        <div *ngFor="let hero of heroes" (click)="gotoDetail(hero)" class="col-1-4">
             <div class="module hero">
                 <h4>{{hero.name}}</h4>
             </div>
@@ -457,11 +491,10 @@ export class DashboardComponent implements OnInit {
 `app/heroes.component.ts`
 
 ```ts
-import { Component, OnInit } from 'angular2/core';
-import { Router } from 'angular2/router';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router-deprecated';
 
 import { Hero } from './hero';
-import { HeroDetailComponent } from './hero-detail.component';
 import { HeroService } from './hero.service';
 
 @Component({
@@ -469,7 +502,7 @@ import { HeroService } from './hero.service';
   template: `
     <h2>My Heroes</h2>
     <ul class="heroes">
-    <li [class.selected]="hero === selectedHero" *ngFor="#hero of heroes" (click)="onSelect(hero)">
+    <li [class.selected]="hero === selectedHero" *ngFor="let hero of heroes" (click)="onSelect(hero)">
         <span class="badge">{{hero.id}}</span> {{hero.name}}
     </li>
     </ul>
@@ -480,7 +513,6 @@ import { HeroService } from './hero.service';
     <button (click)="gotoDetail()">View Details</button>
     </div>  
   `,
-  directives: [HeroDetailComponent]
 })
 export class HeroesComponent implements OnInit {
   heroes: Hero[];
@@ -509,8 +541,8 @@ export class HeroesComponent implements OnInit {
 `app/hero-detail.component.ts`
 
 ```ts
-import { Component, OnInit } from 'angular2/core';
-import {RouteParams} from 'angular2/router';
+import { Component, OnInit } from '@angular/core';
+import { RouteParams } from '@angular/router-deprecated';
 
 import { Hero } from './hero';
 import { HeroService } from './hero.service';
@@ -555,7 +587,7 @@ export class HeroDetailComponent implements OnInit {
 ```ts
 import { Hero } from './hero';
 import { HEROES } from './mock-heroes';
-import { Injectable } from 'angular2/core';
+import { Injectable } from '@angular/core';
 
 @Injectable()
 export class HeroService {
@@ -581,8 +613,8 @@ export class HeroService {
 そして、`app/app.component.ts`でRoutingの設定をします。
 
 ```ts
-import { Component } from 'angular2/core';
-import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from 'angular2/router';
+import { Component } from '@angular/core';
+import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from '@angular/router-deprecated';
 
 import { HeroService } from './hero.service';
 import { DashboardComponent } from './dashboard.component';

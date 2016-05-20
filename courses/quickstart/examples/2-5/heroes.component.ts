@@ -1,5 +1,5 @@
-import { Component, OnInit } from 'angular2/core';
-import { Router } from 'angular2/router';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router-deprecated';
 
 import { Hero } from './hero';
 import { HeroService } from './hero.service';
@@ -9,7 +9,7 @@ import { HeroService } from './hero.service';
   template: `
     <h2>My Heroes</h2>
     <ul class="heroes">
-    <li [class.selected]="hero === selectedHero" *ngFor="#hero of heroes" (click)="onSelect(hero)">
+    <li [class.selected]="hero === selectedHero" *ngFor="let hero of heroes" (click)="onSelect(hero)">
         <span class="badge">{{hero.id}}</span> {{hero.name}}
     </li>
     </ul>
