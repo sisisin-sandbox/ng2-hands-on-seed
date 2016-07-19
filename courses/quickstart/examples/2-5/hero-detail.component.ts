@@ -1,39 +1,28 @@
-import { Component, OnInit } from '@angular/core';
-import { RouteParams } from '@angular/router-deprecated';
-
-import { Hero } from './hero';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { HeroService } from './hero.service';
+import { Hero } from './hero';
 
 @Component({
-  selector: 'my-hero-detail',
-  template: `
-    <div *ngIf="hero">
-        <h2>{{hero.name}} details!</h2>
-        <div>
-            <label>id: </label>{{hero.id}}</div>
-        <div>
-            <label>name: </label>
-            <input [(ngModel)]="hero.name" placeholder="name" />
-        </div>
-        <button (click)="goBack()">Back</button>
-    </div>
-  `
+    selector: 'my-hero-detail',
+    templateUrl: 'app/hero-detail.component.html',
 })
-export class HeroDetailComponent implements OnInit {
-  hero: Hero;
+export class HeroDetailComponent {
+    hero: Hero;
+    sub: any; // rxjs.Subscription
 
-  constructor(
-    private _heroService: HeroService,
-    private _routeParams: RouteParams) {
-  }
-
-  ngOnInit() {
-    let id = +this._routeParams.get('id');
-    this._heroService.getHero(id)
-      .then(hero => this.hero = hero);
-  }
-
-  goBack() {
-    window.history.back();
-  }
+    constructor(
+        private heroService: HeroService,
+        private route: ActivatedRoute) {
+    }
+    ngOnInit() {
+        this.sub = this.route.params.subscribe(params => {
+            let id = +params['id'];
+            this.heroService.getHero(id)
+                .then(hero => this.hero = hero);
+        });
+    }
+    ngOnDestroy() {
+        this.sub.unsubscribe();
+    }
 }

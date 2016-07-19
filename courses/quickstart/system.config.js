@@ -15,23 +15,27 @@ System.config({
       main: 'main.ts',
     },
     '@angular/core': {
-      main: 'core.umd.js',
+      main: 'bundles/core.umd.js',
       defaultExtension: 'js'
     },
     '@angular/compiler': {
-      main: 'compiler.umd.js',
+      main: 'bundles/compiler.umd.js',
       defaultExtension: 'js'
     },
     '@angular/common': {
-      main: 'common.umd.js',
+      main: 'bundles/common.umd.js',
       defaultExtension: 'js'
     },
     '@angular/platform-browser-dynamic': {
-      main: 'platform-browser-dynamic.umd.js',
+      main: 'bundles/platform-browser-dynamic.umd.js',
       defaultExtension: 'js'
     },
     '@angular/platform-browser': {
-      main: 'platform-browser.umd.js',
+      main: 'bundles/platform-browser.umd.js',
+      defaultExtension: 'js'
+    },
+    '@angular/router': {
+      main: 'bundles/router.umd.js',
       defaultExtension: 'js'
     },
     rxjs: {

@@ -2,7 +2,7 @@
 このハンズオンではAngular 2公式の[チュートリアル](https://angular.io/docs/ts/latest/quickstart.html)をベースに行います。
 開発環境は[ハンズオン用のベースプロジェクト](https://github.com/ng-japan/ng2-hands-on-seed)を使用します。
 
-Angularのバージョンは、作成時の最新版である2.0.0-rc.1を使用しています。
+Angularのバージョンは、作成時の最新版である2.0.0-rc.4を使用しています。
 
 ## 準備
 わかるところまでやっておいてもらえるとスムーズに進行できて助かります。
@@ -442,88 +442,54 @@ export class AppComponent implements OnInit {
 Componentの組み立て方はわかってきましたか？
 それでは、複数のComponentを使って、複数ページから構成されるWebページを作ってみましょう。
 
-`AppComponent`をダッシュボード、Heroリスト、Hero詳細の3画面に分割します。
-各画面の実装を順にしていきます。
+![routing](https://angular.io/resources/images/devguide/toh/nav-diagram.png)
 
-`app/dashboard.component.ts`
+ここでは以下の手順に従って、複数の画面を作っていきます。
 
-```ts
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router-deprecated';
+- `AppComponent`をアプリケーションの枠として作り直し、ナビゲーションにのみ用いるようにする
+- 現在の`AppComponent`の機能を`HeroesComponent`として分離する
+- ルートの設定を追加する
+- 新しく`DashboardComponent`を作成する
+- 作成した`DashboardComponent`をナビゲーションに組み込む
 
-import { Hero } from './hero';
-import { HeroService } from './hero.service';
+#### `AppComponent`の修正
 
-@Component({
-  selector: 'my-dashboard',
-  template: `
-    <h3>Top Heroes</h3>
-    <div class="grid grid-pad">
-        <div *ngFor="let hero of heroes" (click)="gotoDetail(hero)" class="col-1-4">
-            <div class="module hero">
-                <h4>{{hero.name}}</h4>
-            </div>
-        </div>
-    </div>
-  `
-})
-export class DashboardComponent implements OnInit {
+まずは現在の`AppComponent`をリネームし、`HeroesComponent`としましょう。
+ファイル名も、`app.component.ts`から`heroes.component.ts`に変更します。
+さらに、`@Component`の`selector`も`my-heroes`に変更します。
 
-  heroes: Hero[] = [];
-
-  constructor(
-    private _router: Router,
-    private _heroService: HeroService) {
-  }
-
-  ngOnInit() {
-    this._heroService.getHeroes()
-      .then(heroes => this.heroes = heroes.slice(1,5));
-  }
-
-  gotoDetail(hero: Hero) {
-    let link = ['HeroDetail', { id: hero.id }];
-    this._router.navigate(link);
-  }
-}
-```
-
-`app/heroes.component.ts`
+**app/heroes.component.ts**
 
 ```ts
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router-deprecated';
-
 import { Hero } from './hero';
+import { HeroDetailComponent } from './hero-detail.component';
 import { HeroService } from './hero.service';
 
 @Component({
   selector: 'my-heroes',
   template: `
+    <h1>{{title}}</h1>
     <h2>My Heroes</h2>
     <ul class="heroes">
     <li [class.selected]="hero === selectedHero" *ngFor="let hero of heroes" (click)="onSelect(hero)">
         <span class="badge">{{hero.id}}</span> {{hero.name}}
     </li>
     </ul>
-    <div *ngIf="selectedHero">
-    <h2>
-        {{selectedHero.name | uppercase}} is my hero
-    </h2>
-    <button (click)="gotoDetail()">View Details</button>
-    </div>  
+    <my-hero-detail [hero]="selectedHero"></my-hero-detail>
   `,
+  directives: [HeroDetailComponent]
 })
 export class HeroesComponent implements OnInit {
+  title = 'Tour of Heroes';
   heroes: Hero[];
   selectedHero: Hero;
 
-  constructor(
-    private _router: Router,
-    private _heroService: HeroService) { }
+  constructor(private _heroService: HeroService) { }
 
   getHeroes() {
-    this._heroService.getHeroes().then(heroes => this.heroes = heroes);
+    this._heroService.getHeroes()
+        .then(heroes => this.heroes = heroes);
   }
 
   ngOnInit() {
@@ -531,49 +497,338 @@ export class HeroesComponent implements OnInit {
   }
 
   onSelect(hero: Hero) { this.selectedHero = hero; }
-
-  gotoDetail() {
-    this._router.navigate(['HeroDetail', { id: this.selectedHero.id }]);
-  }
 }
 ```
 
-`app/hero-detail.component.ts`
+次に、`AppComponent`を新しく作ります。
+`AppComponent`がもともと担っていた機能は`HeroesComponent`に移ったので、
+`AppComponent`では`<my-heroes>`コンポーネントを配置するだけになります。
+`<h1>`タグはアプリケーションのタイトルなので`HeroesComponent`のテンプレートから移動しましょう。
+
+この時、 `HeroesComponent`の`providers`も`AppComponent`に移動しましょう。
+DIされるクラスは`providers`ごとにインスタンス化されるので、
+基本的には最上位の`AppComponent`の`providers`に書くようにします。
+
+**app/app.component.ts**
+
+```ts
+import { Component }       from '@angular/core';
+import { HeroService }     from './hero.service';
+import { HeroesComponent } from './heroes.component';
+@Component({
+  selector: 'my-app',
+  template: `
+    <h1>{{title}}</h1>
+    <my-heroes></my-heroes>
+  `,
+  directives: [HeroesComponent],
+  providers: [
+    HeroService
+  ]
+})
+export class AppComponent {
+  title = 'Tour of Heroes';
+}
+```
+
+これで`AppComponent`の機能を`HeroesComponent`に分離することができました。
+
+#### ルート設定
+
+ここからいよいよルーティングを行っていきます。
+ルーティングには、URLとそれに対応するコンポーネントを紐付けるため、
+ルートの設定が必要です。
+ルートの設定を記述するためのファイルを`app.routes.ts`として、appディレクトリ内に作成しましょう。
+
+**app/app.routes.ts**
+
+```ts
+import { provideRouter, RouterConfig }  from '@angular/router';
+import { HeroesComponent } from './heroes.component';
+
+const routes: RouterConfig = [
+  {
+    path: 'heroes',
+    component: HeroesComponent
+  }
+];
+
+export const appRouterProviders = [
+  provideRouter(routes)
+];
+```
+
+`@angular/router`パッケージでは、ルーティングは`RouteConfig`という型で定義します。
+基本的には`RouteConfig`はpathとcomponentのセットの配列で、
+今回はまず、`/heroes`というパスにアクセスされたときに`HeroesComponent`が表示されるようにします。
+
+定義したルート設定は、`provideRouter`という関数に引数として渡し、その戻り値をProviderとして使用します。
+ルーティングに関係するプロバイダはアプリケーションの起動時に必要となるので、
+main.tsの`bootstrap`関数の第2引数に渡します。
+
+**app/main.ts**
+
+```ts
+import { bootstrap }    from '@angular/platform-browser-dynamic';
+
+import { AppComponent } from './app.component';
+import { appRouterProviders } from './app.routes';
+
+bootstrap(AppComponent, [
+  appRouterProviders
+]);
+```
+
+仕上げとして、ルーティングによってコンポーネントを切り替えるための場所を用意します。
+`RouterOutlet`というコンポーネントが置かれた位置に、ルーティングによって選ばれたコンポーネントが読み込まれます。
+`AppComponent`を次のように書き換えましょう。
+テンプレート内で直接配置していた`HeroesComponent`を外し、
+代わりに`ROUTER_DIRECTIVES`から提供される`<router-outlet>`と`routerLink`を使用します。
+
+```ts
+import { Component }       from '@angular/core';
+import { HeroService }     from './hero.service';
+import { HeroesComponent } from './heroes.component';
+@Component({
+  selector: 'my-app',
+  template: `
+    <h1>{{title}}</h1>
+    <a [routerLink]="['/heroes']">Heroes</a>
+    <router-outlet></router-outlet>
+  `,
+  directives: [HeroesComponent],
+  providers: [
+    HeroService
+  ]
+})
+export class AppComponent {
+  title = 'Tour of Heroes';
+}
+```
+
+さて、ブラウザでアプリケーションを開くと、最初はリンクだけが表示されます。
+リンクをクリックして`/heroes`に移動すると、`HeroesComponent`が表示されるはずです。
+
+#### ダッシュボードの追加
+
+新しくダッシュボード画面を作りましょう。
+まずは単純なコンポーネントを`dashboard.component.ts`として作成します
+
+**app/dashboard.component.ts**
+
+```ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'my-dashboard',
+  template: '<h3>My Dashboard</h3>'
+})
+export class DashboardComponent { }
+```
+
+そして、ルート設定に`DashboardComponent`用のルートを追加します。
+
+```ts
+{
+    path: 'dashboard',
+    component: DashboardComponent
+},
+```
+
+また、パスがない状態でアクセスしたときに、`/dashboard`にリダイレクトするように設定します。
+
+```ts
+{
+    path: '',
+    redirectTo: '/dashboard',
+    pathMatch: 'full'
+},
+```
+
+`AppComponent`のテンプレートにも、`/dashboard`用のリンクを追加しておきましょう。
+
+```ts
+  <h1>{{title}}</h1>
+  <nav>
+    <a [routerLink]="['/dashboard']" routerLinkActive="active">Dashboard</a>
+    <a [routerLink]="['/heroes']" routerLinkActive="active">Heroes</a>
+  </nav>
+  <router-outlet></router-outlet>
+```
+
+`DashboardComponent`をルーティングで表示することができたので、内容を作っていきましょう。
+ダッシュボードではトップ4人のヒーローが表示されるという仕様にします。
+
+これまでコンポーネントのテンプレートはすべてtsファイル中に記述していましたが、
+`DashboardComponent`では外部のHTMLファイルに分離してみましょう。
+`app/dashboard.component.html`ファイルを作成し、次のテンプレートを記述します。
+
+```html
+<h3>Top Heroes</h3>
+<div class="grid grid-pad">
+  <div *ngFor="let hero of heroes" (click)="gotoDetail(hero)" class="col-1-4">
+    <div class="module hero">
+      <h4>{{hero.name}}</h4>
+    </div>
+  </div>
+</div>
+```
+
+そして、`DashboardComponent`の`template`を`templateUrl`に書き換え、
+HTMLファイルのパスを渡します。
+
+```ts
+  templateUrl: 'app/dashboard.component.html',
+```
+
+`HeroesComponent`と同様に、`HeroService`からヒーローのリストを取得するように書きなおせばとりあえず完成です。
+ただし、ダッシュボードからヒーローをクリックした時の処理はまだ実装されていません。
+ここには、ダッシュボードからヒーローの詳細画面への遷移の処理を書く必要があります。
 
 ```ts
 import { Component, OnInit } from '@angular/core';
-import { RouteParams } from '@angular/router-deprecated';
+
+import { Hero } from './hero';
+import { HeroService } from './hero.service';
+
+@Component({
+  selector: 'my-dashboard',
+  templateUrl: 'app/dashboard.component.html',
+})
+export class DashboardComponent implements OnInit {
+  heroes: Hero[] = [];
+  constructor(private heroService: HeroService) { }
+  ngOnInit() {
+    this.heroService.getHeroes()
+      .then(heroes => this.heroes = heroes.slice(1, 5));
+  }
+  gotoDetail() { /* not implemented yet */}
+}
+```
+
+#### 詳細画面
+
+ヒーローの詳細はこれまで`<my-hero-detail>`コンポーネントを使っていましたが、
+これはまだルーティングに組み込まれておらず、テンプレート中で呼び出すしかありません。
+`HeroDetailComponent`も`/detail/11`のようなURLでアクセスできるようにしましょう。
+
+```ts
+{
+    path: 'detail/:id',
+    component: HeroDetailComponent
+},
+```
+
+`:`で始まる部分は、パラメータとしてコンポーネント側で受け取ることができます。
+ここではヒーローのIDをパラメータとして受け取り、そのIDを元に詳細を表示するヒーローを判別します。
+`HeroDetailComponent`は`Hero`のオブジェクトを直接`Input`として受け取っていましたが、
+ルーターからIDを受け取り、サービスからIDを元にヒーローを取得するように修正しましょう。
+
+```ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { HeroService } from './hero.service';
+import { Hero } from './hero';
+
+@Component({
+    selector: 'my-hero-detail',
+    template: `
+    <div *ngIf="hero">
+        <h2>{{hero.name}} details!</h2>
+        <div><label>id: </label>{{hero.id}}</div>
+        <div>
+            <label>name: </label>
+            <input [(ngModel)]="hero.name" placeholder="name"/>
+        </div>
+    </div>
+`,
+})
+export class HeroDetailComponent {
+    sub: any; // rxjs.Subscription
+    
+    constructor(
+        private heroService: HeroService,
+        private route: ActivatedRoute) {
+    }
+    ngOnInit() {
+        this.sub = this.route.params.subscribe(params => {
+            let id = +params['id'];
+            this.heroService.getHero(id)
+                .then(hero => this.hero = hero);
+        });
+    }
+    ngOnDestroy() {
+        this.sub.unsubscribe();
+    }
+}
+```
+
+もちろん`HeroService`側にも`getHero(id)`というメソッドを追加します。
+
+```ts
+getHero(id: number) {
+  return this.getHeroes()
+             .then(heroes => heroes.find(hero => hero.id === id));
+}
+```
+
+詳細画面から戻るためのボタンも追加してみましょう。
+ブラウザのHistoryAPIを使って前の画面に戻るためのメソッドを`HeroDetailComponent`に追加します。
+
+```ts
+goBack() {
+  window.history.back();
+}
+```
+
+`goBack`メソッドをテンプレートから呼び出しましょう。
+また、`HeroDetailComponent`のテンプレートもHTMLファイルに分離してみましょう。
+
+```html
+<div *ngIf="hero">
+  <h2>{{hero.name}} details!</h2>
+  <div>
+    <label>id: </label>{{hero.id}}</div>
+  <div>
+    <label>name: </label>
+    <input [(ngModel)]="hero.name" placeholder="name" />
+  </div>
+  <button (click)="goBack()">Back</button>
+</div>
+```
+
+最終的に`HeroDetailComponent`は次のようになります
+
+```ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { Hero } from './hero';
 import { HeroService } from './hero.service';
 
 @Component({
   selector: 'my-hero-detail',
-  template: `
-    <div *ngIf="hero">
-        <h2>{{hero.name}} details!</h2>
-        <div>
-            <label>id: </label>{{hero.id}}</div>
-        <div>
-            <label>name: </label>
-            <input [(ngModel)]="hero.name" placeholder="name" />
-        </div>
-        <button (click)="goBack()">Back</button>
-    </div>
-  `
+  templateUrl: 'app/hero-detail.component.html',
 })
-export class HeroDetailComponent implements OnInit {
+export class HeroDetailComponent implements OnInit, OnDestroy {
   hero: Hero;
+  sub: any;
 
   constructor(
-    private _heroService: HeroService,
-    private _routeParams: RouteParams) {
+    private heroService: HeroService,
+    private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    let id = +this._routeParams.get('id');
-    this._heroService.getHero(id)
-      .then(hero => this.hero = hero);
+    this.sub = this.route.params.subscribe(params => {
+      let id = +params['id'];
+      this.heroService.getHero(id)
+        .then(hero => this.hero = hero);
+    });
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
   goBack() {
@@ -582,91 +837,92 @@ export class HeroDetailComponent implements OnInit {
 }
 ```
 
-`app/hero.service.ts`にも少し変更を加えます。
+#### ナビゲーション
+ダッシュボードから詳細画面へ移動する処理を、テンプレートではなくコンポーネントの処理として書いてみましょう。
+さっきまで何も実装されていなかった`DashboardComponent`の`gotoDetail`メソッドを次のようにします。
 
 ```ts
-import { Hero } from './hero';
-import { HEROES } from './mock-heroes';
-import { Injectable } from '@angular/core';
-
-@Injectable()
-export class HeroService {
-  getHeroes() {
-    return Promise.resolve(HEROES);
-  }
-
-  // See the "Take it slow" appendix
-  getHeroesSlowly() {
-    return new Promise<Hero[]>(resolve =>
-      setTimeout(()=>resolve(HEROES), 2000) // 2 seconds
-    );
-  }
-
-  getHero(id: number) {
-    return Promise.resolve(HEROES).then(
-      heroes => heroes.filter(hero => hero.id === id)[0]
-    );
-  }
+gotoDetail(hero: Hero) {
+    let link = ['/detail', hero.id];
+    this.router.navigate(link);
 }
 ```
 
-そして、`app/app.component.ts`でRoutingの設定をします。
+`this.router`を使うために、新しくimport文とコンストラクタ引数を追加しましょう
 
 ```ts
-import { Component } from '@angular/core';
-import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from '@angular/router-deprecated';
+import { Router } from '@angular/router';
 
-import { HeroService } from './hero.service';
-import { DashboardComponent } from './dashboard.component';
-import { HeroesComponent } from './heroes.component';
+...
+
+constructor(
+  private router: Router,
+  private heroService: HeroService) {
+}
+```
+
+`router.navigate`メソッドは`routerLink`と同じように、ナビゲーションを実行することができます。
+
+ダッシュボード画面でヒーローをクリックすると詳細画面へ移動するようになっているはずです。
+
+#### `HeroesComponent`からの遷移
+
+最後に、`HeroesComponent`からも詳細画面へ遷移できるようにしましょう。
+これまでは同じ画面に`HeroDetailComponent`が表示されていましたが、
+代わりに`/detail/:id`へ遷移するためのボタンを置くことにします。
+
+`HeroesComponent`もテンプレートを`heroes.component.html`に分離し、
+次のようにします。
+
+```html
+<h2>My Heroes</h2>
+<ul class="heroes">
+    <li [class.selected]="hero === selectedHero" *ngFor="let hero of heroes" (click)="onSelect(hero)">
+        <span class="badge">{{hero.id}}</span> {{hero.name}}
+    </li>
+</ul>
+<div *ngIf="selectedHero">
+    <h2>
+        {{selectedHero.name | uppercase}} is my hero
+    </h2>
+    <button (click)="gotoDetail()">View Details</button>
+</div>
+```
+
+そしてコンポーネント側に`gotoDetail`メソッドを実装します。
+
+```ts
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Hero } from './hero';
 import { HeroDetailComponent } from './hero-detail.component';
+import { HeroService } from './hero.service';
 
 @Component({
-  selector: 'my-app',
-  template: `
-    <h1>{{title}}</h1>
-    <nav>
-        <a [routerLink]="['Dashboard']">Dashboard</a>
-        <a [routerLink]="['Heroes']">Heroes</a>
-    </nav>
-    <router-outlet></router-outlet>  
-  `,
-  directives: [ROUTER_DIRECTIVES],
-  providers: [
-    ROUTER_PROVIDERS,
-    HeroService
-  ]
+  selector: 'my-heroes',
+  templateUrl: 'app/heroes.component.html',
+  directives: [HeroDetailComponent]
 })
-@RouteConfig([
-  {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: DashboardComponent,
-    useAsDefault: true
-  },
-  {
-    path: '/detail/:id',
-    name: 'HeroDetail',
-    component: HeroDetailComponent
-  },
-  {
-    path: '/heroes',
-    name: 'Heroes',
-    component: HeroesComponent
+export class HeroesComponent implements OnInit {
+  heroes: Hero[];
+  selectedHero: Hero;
+  constructor(
+    private router: Router,
+    private heroService: HeroService) { }
+  getHeroes() {
+    this.heroService.getHeroes().then(heroes => this.heroes = heroes);
   }
-])
-export class AppComponent {
-  title = 'Tour of Heroes';
+  ngOnInit() {
+    this.getHeroes();
+  }
+  onSelect(hero: Hero) { this.selectedHero = hero; }
+  gotoDetail() {
+    this.router.navigate(['/detail', this.selectedHero.id]);
+  }
 }
 ```
 
-`@RouteConfig`デコレーターでRoutingの設定を行っています。
-どの`path`に対してどのComponentを割り当てるかを決めています。
-
-また、`<router-outlet></router-outlet>`の部分に現在の`path`に対するComponentの中身が生成されます。
-
-お疲れ様でした。
-ここで実行してみると、リンクをクリックするとページが切り替わっていくのが確認できると思います。
+これで当初の計画通り、3画面での移動が完成しました。
 
 ## おわりに
 
@@ -674,3 +930,4 @@ export class AppComponent {
 Componentの扱いといった基本的なことや、Serviceの分離とRoutingなどの大規模開発に必要な要素は一通り押さえられたと思います。
 
 もっと詳しく知りたい人は[Angular 2のサイト](https://angular.io)も読んでみてください。
+公式のQuickStartには今回触れなかった項目がいくつかありますので、おさらいを兼ねてもう一度[QuickStart](https://angular.io/docs/ts/latest/tutorial/)をやってみると良いかもしれません。
