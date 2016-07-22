@@ -744,6 +744,7 @@ import { Hero } from './hero';
 `,
 })
 export class HeroDetailComponent {
+    hero: Hero;
     sub: any; // rxjs.Subscription
     
     constructor(
