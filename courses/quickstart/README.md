@@ -588,7 +588,7 @@ bootstrap(AppComponent, [
 ```ts
 import { Component }       from '@angular/core';
 import { HeroService }     from './hero.service';
-import { HeroesComponent } from './heroes.component';
+import { ROUTER_DIRECTIVES} from './heroes.component';
 @Component({
   selector: 'my-app',
   template: `
@@ -596,7 +596,7 @@ import { HeroesComponent } from './heroes.component';
     <a [routerLink]="['/heroes']">Heroes</a>
     <router-outlet></router-outlet>
   `,
-  directives: [HeroesComponent],
+  directives: [ROUTER_DIRECTIVES],
   providers: [
     HeroService
   ]
