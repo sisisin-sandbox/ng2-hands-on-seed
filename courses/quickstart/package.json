@@ -4,7 +4,10 @@
   "scripts": {
     "postinstall": "typings install",
     "start": "npm run serve",
-    "serve": "lite-server"
+    "serve": "lite-server",
+    "tsc:w": "tsc -w",
+    "build:w": "watchify _tmp/main.js -o bundle.js -d",
+    "build": "tsc && browserify _tmp/main.js -o bundle.js"
   },
   "contributors": [
     "laco0416 <laco0416@gmail.com>"
@@ -21,14 +24,15 @@
     "@angular/platform-browser": "2.0.0-rc.4",
     "@angular/platform-browser-dynamic": "2.0.0-rc.4",
     "@angular/router": "3.0.0-beta.2",
-    "core-js": "^2.4.0",
+    "core-js": "^2.4.1",
     "rxjs": "5.0.0-beta.6",
-    "systemjs": "^0.19.25",
     "typescript": "^1.8.9",
     "zone.js": "0.6.12"
   },
   "devDependencies": {
+    "browserify": "^13.0.1",
     "lite-server": "^2.1.0",
-    "typings": "^1.0.4"
+    "typings": "^1.0.4",
+    "watchify": "^3.7.0"
   }
 }

@@ -6,9 +6,11 @@
         "sourceMap": false,
         "moduleResolution": "node",
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": true,
+        "outDir": "./_tmp"
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "examples"
     ]
 }
